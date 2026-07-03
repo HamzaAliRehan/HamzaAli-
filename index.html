@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Bridge Between 13 and 14</title>
+<meta name="description" content="How I stumbled onto a thousand-year-old theorem by playing with two-digit numbers — an interactive essay on digit sums, digit differences, and the two shadows every base casts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B2E18; --bg2:#0D3520; --card:#11301D;
+    --line:rgba(237,243,234,.22); --line-soft:rgba(237,243,234,.12);
+    --chalk:#EDF3EA; --muted:#9DB8A4;
+    --amber:#FFB13D; --green:#5ECB7B; --blue:#6FB7E8; --pink:#E88AB8;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; color:var(--chalk);
+    background:repeating-linear-gradient(90deg,var(--bg) 0 90px,var(--bg2) 90px 180px);
+    font-family:'Source Serif 4', Georgia, serif;
+    font-size:17.5px; line-height:1.72;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:56px 20px 80px}
+  header.hero{text-align:center; margin-bottom:44px}
+  .hero h1{
+    font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.28em;
+    font-weight:500; font-size:clamp(24px,5vw,38px); margin:0 0 14px;
+  }
+  .hero .dek{color:var(--muted); font-style:italic; font-size:16.5px; max-width:560px; margin:0 auto}
+  .rule{border:none; border-top:1px dashed var(--line); margin:34px auto; width:120px}
+  h2{
+    font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.2em;
+    font-weight:500; font-size:16px; color:var(--amber); margin:44px 0 14px;
+  }
+  p{margin:0 0 18px}
+  em{color:var(--chalk)}
+  b,strong{font-weight:600; color:var(--chalk)}
+  .a{color:var(--amber)} .g{color:var(--green)} .b{color:var(--blue)} .p{color:var(--pink)}
+  blockquote{
+    margin:26px 0; padding:16px 20px; border-left:3px solid var(--amber);
+    background:rgba(255,177,61,.07); font-size:17px;
+  }
+  .widget{
+    background:var(--card); border:1px solid var(--line-soft); border-radius:14px;
+    padding:16px; margin:30px -8px;
+  }
+  .widget-label{
+    font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.18em;
+    font-size:11.5px; color:var(--muted); text-align:center; margin-bottom:10px;
+  }
+  .chips{display:flex; gap:7px; flex-wrap:wrap; justify-content:center; margin-bottom:12px}
+  button.chip{
+    font-family:inherit; font-size:13px; padding:7px 13px; border-radius:999px; cursor:pointer;
+    border:1.5px solid var(--line); background:transparent; color:var(--chalk);
+  }
+  button.chip.on{border-color:var(--amber); background:rgba(255,177,61,.15); color:var(--amber)}
+  button.chip.base{font-family:'Oswald',sans-serif; font-size:14px; border-radius:8px}
+  button.chip.base.on{background:var(--amber); color:#1E1503}
+  .gridbox{display:grid; gap:3px}
+  .cell{
+    aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+    font-family:'Oswald',sans-serif; font-size:12px; border-radius:5px; cursor:pointer;
+    border:1px solid var(--line-soft); color:var(--muted); background:transparent;
+    transition:transform .1s; position:relative; user-select:none;
+  }
+  @media (prefers-reduced-motion:reduce){ .cell{transition:none} }
+  .cell.sel{transform:scale(1.14); z-index:2}
+  .hdr{display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--muted); font-family:'Oswald',sans-serif}
+  .legend{display:flex; gap:14px; flex-wrap:wrap; margin-top:10px; font-size:12px; color:var(--muted); font-family:'Oswald',sans-serif; letter-spacing:.04em}
+  .detail{
+    margin-top:12px; border-top:1px dashed var(--line-soft); padding-top:12px;
+    font-size:13.5px; line-height:1.8; font-family:'Source Serif 4',serif;
+  }
+  .detail .big{font-family:'Oswald',sans-serif; color:var(--amber); font-size:30px; line-height:1}
+  .chainrow{display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; margin-bottom:10px; font-size:13px}
+  .chainrow input{
+    width:64px; background:transparent; border:1px solid var(--line); border-radius:6px;
+    color:var(--amber); padding:5px 8px; font-family:'Oswald',sans-serif; font-size:15px;
+  }
+  .banner{
+    text-align:center; font-size:13.5px; padding:9px 14px; border-radius:10px;
+    border:1px dashed var(--line); background:rgba(255,177,61,.07); margin-bottom:12px;
+    font-family:'Source Serif 4',serif;
+  }
+  .readout{margin-top:12px; font-size:13.5px; line-height:1.7; border-top:1px dashed var(--line-soft); padding-top:12px}
+  footer{color:var(--muted); font-size:13.5px; text-align:center; margin-top:56px; font-style:italic}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--amber); outline-offset:2px}
+  @media (max-width:520px){ body{font-size:16px} .cell{font-size:10px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>The Bridge Between<br>13 and 14</h1>
+  <p class="dek">How I stumbled onto a thousand-year-old theorem by playing with two-digit numbers — and why the detour was worth more than the destination.</p>
+</header>
+
+<p>It started with the number 13.</p>
+
+<p>I was looking for two-digit multiples of 13, and I gave myself an odd little rule: take the multiple whose last digit lands closest to ten. That's 39. The reason for the rule was the move I wanted to make next — go one digit <em>up</em> on the first digit, one digit <em>down</em> on the second. Do that to 39 and you get 48. Do it again: 57. Again: 66.</p>
+
+<p>Then something curious happens. Keep going and you get 75, 84, 93 — but these aren't new numbers. They're the old ones reflected: 75 is 57 backwards, 84 is 48 backwards, 93 is 39 backwards. The chain hits 66, a palindrome, and starts walking back through its own mirror. So if you refuse to count the reflections, the pattern of 13 is exactly four numbers: <b class="a">39, 48, 57, 66</b>.</p>
+
+<p>I ran the same recipe on 14. The multiple with the last digit nearest ten is 28, and the same move produces <b class="g">28, 37, 46, 55</b> — four numbers again, with the same mirror trick waiting past the palindrome (64, 73, 82). Two patterns, same shape, same length, same strange symmetry. That was enough to make me sure I was looking at <em>something</em>. I just didn't know what.</p>
+
+<h2>The bridge</h2>
+
+<p>The third pattern came from an unexpected place. I was looking at the chapters of the Quran and their verse counts, with the number 47 on my mind. Among chapters with fewer than 47 verses, the closest count was 38. Among chapters with more, the closest was 49. So I had 38 and 49 — and when I extended them backwards the same way they extend forward, I got a third chain: <b class="b">16, 27, 38, 49</b>.</p>
+
+<p>I'm not going to claim the verse counts caused anything. But I'll tell the truth about where I was standing when I noticed these two numbers, because where you happen to be looking is part of every discovery story, and this is where I was looking.</p>
+
+<p>I called the new chain the <em>bridge</em>, and here's why. Take 27, its second number. Its immediate neighbors are 26 and 28 — which are precisely the second multiples of 13 and 14. Take 38: its neighbors are 37 and 39 — one number from the pattern of 14, one from the pattern of 13, the bridge sitting exactly between them. And 49 lands right beside 48 from the pattern of 13, while 46 from the pattern of 14 sits two steps away, joined to them through 47 — the very number that started the search.</p>
+
+<p>Three chains. Two of them running parallel, and a third that seemed to touch both without belonging to either. I could see <em>that</em> it happened. I wanted to know <em>why</em>.</p>
+
+<h2>What the move really was</h2>
+
+<p>The answer begins with an embarrassingly simple observation I had somehow never made: my move — first digit up by one, second digit down by one — is just <b>adding 9</b>. Raising the tens digit adds ten; lowering the units digit takes one back. Ten minus one. Every chain I'd built by hand was an arithmetic sequence in disguise.</p>
+
+<p>And adding 9 has a famous property: it never changes a number's digit sum. Check it against the patterns. The pattern of 13 — 39, 48, 57, 66 — every one sums to 12. The pattern of 14 — 28, 37, 46, 55 — every one sums to 10. Each of my patterns was a chain of numbers frozen on a single digit sum, which is why they run so perfectly parallel: they <em>are</em> parallel, literally, if you draw them.</p>
+
+<p>So draw them. Put every two-digit number on a grid — tens digit down the side, units digit across the top — and the add-9 chains appear as diagonals running one way across the board. I started calling them <b>ladders</b>. My pattern of 13 is the entire sum-12 ladder. My pattern of 14 is the sum-10 ladder. Even the mirror trick turned out to be a law: reversing a two-digit number always changes it by a multiple of 9 (reverse 10a&nbsp;+&nbsp;b and you get 10b&nbsp;+&nbsp;a; the difference is 9&nbsp;×&nbsp;(a&nbsp;−&nbsp;b)), so a reflection can never escape its own ladder. The palindrome 66 isn't where my pattern ends — it's the hinge where the ladder folds onto itself.</p>
+
+<div class="widget" id="w1">
+  <div class="widget-label">Explore it yourself — tap any number</div>
+</div>
+
+<p>But the bridge broke the rule. 16, 27, 38, 49 — the digit sums are 7, 9, 11, 13. Not frozen at all. I checked the step: 27&nbsp;−&nbsp;16 is not 9. It's <b class="b">11</b>.</p>
+
+<h2>The other diagonal</h2>
+
+<p>Adding 11 to a two-digit number raises <em>both</em> digits at once. On the grid, these chains run along the other diagonal — perpendicular, so to speak, to the ladders — and what they freeze is not the digit sum but the digit <em>difference</em>. Every number in my bridge has units minus tens equal to exactly 5: 6−1, 7−2, 8−3, 9−4.</p>
+
+<p>This is the moment the whole picture snapped into focus. The decimal system has two special companions, and they are the two neighbors of ten itself. Because 10 leaves remainder <b>+1</b> when divided by 9, a number and its digit sum are interchangeable in the world of nine — that's the ladders. Because 10 leaves remainder <b>−1</b> when divided by 11, what survives in the world of eleven is the alternating difference of digits — that's the bridges. I hadn't found two patterns and an anomaly. I had found the grid's two fundamental directions, one governed by 9 and one by 11, crossing each other everywhere.</p>
+
+<p>And the crossing explains everything I'd noticed by eye. A ladder (digit sum <em>s</em>) and a bridge (digit difference <em>d</em>) intersect only where both digits come out whole — solving the two conditions gives the units digit as (s&nbsp;+&nbsp;d)&nbsp;/&nbsp;2, which forces <b>s&nbsp;+&nbsp;d to be even</b>. My bridge has difference 5, an odd number. So it can only ever cross odd-sum ladders — it hits sums 7, 9, 11, 13, at exactly 16, 27, 38, 49. It can <em>never</em> land on the sum-12 ladder of my pattern of 13, or the sum-10 ladder of my pattern of 14. Parity forbids it.</p>
+
+<p>Which means the theorem I'd been circling the whole time is this:</p>
+
+<blockquote><b>A bridge crosses a ladder only when the ladder's digit sum and the bridge's digit difference share the same parity. A bridge with an odd difference threads between the even-sum ladders forever — adjacent at every rung, never touching.</b></blockquote>
+
+<p>That is what I had seen in the neighbors. 38 wedged between 37 and 39. 49 shoulder-to-shoulder with 48. The bridge passing over my two patterns at the closest possible distance, structurally unable to touch either one. I had named it better than I knew.</p>
+
+<p>There was one more grace note. The sum-11 ladder — 29, 38, 47, 56, 65, 74, 83, 92 — is the border strip that separates my two patterns, sum 12 on one side and sum 10 on the other. My bridge crosses that border at 38. And sitting on that same border ladder is 47: the number that sent me looking in the first place, living exactly between the two patterns it helped me find.</p>
+
+<h2>The confession, and the punchline</h2>
+
+<p>Here is the part where I'm honest with you. None of this is new. The digit-sum rule is <em>casting out nines</em>, and it is over a thousand years old — Indian mathematicians knew it, al-Khwarizmi wrote about it, medieval bookkeepers used it to check their sums. The rule of eleven is centuries old too. I didn't discover these theorems. I <em>re</em>-discovered them, walking in through a side door nobody had told me existed, and I only learned their names after I already knew their shapes.</p>
+
+<p>I've decided that this is the good ending, not the disappointing one. Rediscovery is how the instinct trains itself: you notice, you conjecture, you follow the structure until it confesses — and then you find out the confession matches a page written ten centuries ago, which means your instrument is calibrated. The theorem wasn't new. The route was mine.</p>
+
+<p>And the route has a final turn that I think even people who know casting-out-nines rarely stop to see. Nothing above is really about 9 and 11. It's about <b>one less than the base and one more than the base</b>. Run my original recipe in base twelve, where the special numbers become 11 and 13, and my "pattern of 13" — now the pattern of fifteen, which base twelve <em>writes</em> as 13 — comes out as 39, 48, 57, 66 all over again, the same digits, with two new rungs (A2, B1) that decimal never had room for. The bridge rebuilds. The parity law holds untouched, because sums and differences don't care what base you write them in.</p>
+
+<div class="widget" id="w2">
+  <div class="widget-label">Change the base — watch the patterns reincarnate</div>
+</div>
+
+<p>I went looking for a pattern in the number 13 and found a property of <em>notation itself</em> — true in every base humans could ever have chosen, waiting on whichever grid you draw. The numbers weren't hiding a message. They were hiding a mirror, and every base you hold it up to shows you the same face.</p>
+
+<p>That, it turns out, was the bridge.</p>
+
+<hr class="rule">
+<footer>Ladders step by B−1 and freeze the digit sum; bridges step by B+1 and freeze the digit difference.<br>Every grid on this page is computed live — tap around and check everything.<br><br>The patterns, the route, and the discovery story are mine. The prose was written and the interactive<br>visualizations were built with the assistance of Claude, an AI by Anthropic.</footer>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+const DIG = "0123456789ABCDEF";
+const css = getComputedStyle(document.documentElement);
+const COLOR = {
+  amber: css.getPropertyValue('--amber').trim(),
+  green: css.getPropertyValue('--green').trim(),
+  blue:  css.getPropertyValue('--blue').trim(),
+  pink:  css.getPropertyValue('--pink').trim(),
+  chalk: css.getPropertyValue('--chalk').trim(),
+  muted: css.getPropertyValue('--muted').trim(),
+};
+const toB = (n,B)=> DIG[Math.floor(n/B)] + DIG[n%B];
+const an = (n,B)=>{ const t=Math.floor(n/B), u=n%B; return {t,u,sum:t+u,diff:u-t,rev:u*B+t}; };
+const sumColor = (s,B)=>`hsl(${(s/(2*B-2))*330},55%,55%)`;
+const diffColor= (d,B)=>`hsl(${((d+B-1)/(2*B-2))*330},55%,55%)`;
+
+// user's recipe generalized: multiple of m with largest units digit; walk +(B-1); core ends at palindrome
+function buildPattern(m,B){
+  const hi=B*B-1; let best=null,bestU=-1;
+  for(let k=m;k<=hi;k+=m){ if(k<B)continue; const u=k%B; if(u>bestU){bestU=u;best=k;} }
+  if(best==null) return {core:[],inv:[]};
+  const chain=[];
+  for(let n=best;n<=hi;n+=B-1){ chain.push(n); if(n%B===0)break; }
+  const pi=chain.findIndex(n=>Math.floor(n/B)===n%B);
+  if(pi<0) return {core:chain,inv:[]};
+  return {core:chain.slice(0,pi+1), inv:chain.slice(pi+1)};
+}
+const bridgeChain=(B,d)=>{ const o=[]; for(let t=1;t<=B-1;t++){const u=t+d; if(u>=0&&u<=B-1)o.push(t*B+u);} return o; };
+function chainFrom(s,step,B){ const lo=B,hi=B*B-1,o=[s];
+  for(let n=s+step;n<=hi;n+=step)o.push(n);
+  for(let n=s-step;n>=lo;n-=step)o.unshift(n); return o; }
+
+function makeExplorer(rootId, opts){
+  const root=document.getElementById(rootId);
+  const state={ B:10, mode:opts.defaultMode, sel:38, chainStart:39, chainKind:'ladder' };
+  const el=(t,cls,txt)=>{const e=document.createElement(t); if(cls)e.className=cls; if(txt!=null)e.innerHTML=txt; return e;};
+
+  const baseRow = opts.bases ? el('div','chips') : null;
+  const modeRow = el('div','chips');
+  const banner  = opts.bases ? el('div','banner') : null;
+  const chainRow= el('div','chainrow');
+  const grid    = el('div','gridbox');
+  const legend  = el('div','legend');
+  const detail  = el('div','detail');
+  const readout = opts.bases ? el('div','readout') : null;
+
+  if(baseRow) root.appendChild(baseRow);
+  if(banner)  root.appendChild(banner);
+  root.appendChild(modeRow); root.appendChild(chainRow); root.appendChild(grid);
+  root.appendChild(legend); root.appendChild(detail);
+  if(readout) root.appendChild(readout);
+
+  const MODES = opts.bases
+    ? [['reborn','Your patterns, reborn'],['sums','Ladder families'],['diffs','Bridge families'],['chain','Chain builder']]
+    : [['patterns','The three patterns'],['sums','Ladder families'],['diffs','Bridge families'],['chain','Chain builder']];
+
+  function render(){
+    const B=state.B, hi=B*B-1;
+    state.sel=Math.min(hi,Math.max(B,state.sel));
+    const p13=buildPattern(B+3,B), p14=buildPattern(B+4,B), br=bridgeChain(B,5);
+    const step = state.chainKind==='ladder'?B-1:B+1;
+    const cs=Math.min(hi,Math.max(B,state.chainStart));
+    const chain=chainFrom(cs,step,B);
+
+    if(baseRow){ baseRow.innerHTML='';
+      opts.bases.forEach(b=>{
+        const btn=el('button','chip base'+(B===b?' on':''),'base '+b);
+        btn.onclick=()=>{ state.B=b; state.sel=3*b+9<=b*b-1?3*b+9:b+5; state.chainStart=b+5; render(); };
+        baseRow.appendChild(btn);
+      });
+      banner.innerHTML = 'In base <b class="a">'+B+'</b>: ladders step by <b class="a">'+(B-1)+
+        '</b> (digit sum frozen) · bridges step by <b class="b">'+(B+1)+'</b> (digit difference frozen) · '+
+        '"13" becomes <b class="a">'+(B+3)+'</b> (written '+toB(B+3,B)+'), "14" becomes <b class="g">'+(B+4)+'</b> (written '+toB(B+4,B)+')'+
+        (B===12?' — and your pattern\u2019s digits are <b class="a">still 39, 48, 57, 66</b>, with two new rungs decimal couldn\u2019t hold.':'');
+    }
+
+    modeRow.innerHTML='';
+    MODES.forEach(([k,label])=>{
+      const btn=el('button','chip'+(state.mode===k?' on':''),label);
+      btn.onclick=()=>{ state.mode=k; render(); };
+      modeRow.appendChild(btn);
+    });
+
+    chainRow.style.display = state.mode==='chain'?'flex':'none';
+    if(state.mode==='chain'){
+      chainRow.innerHTML='';
+      const lab=el('label',null,'Start (decimal): ');
+      const inp=el('input'); inp.type='number'; inp.min=B; inp.max=hi; inp.value=cs;
+      inp.onchange=()=>{ state.chainStart=+inp.value||B; render(); };
+      lab.appendChild(inp); chainRow.appendChild(lab);
+      [['ladder','ladder +'+(B-1)],['bridge','bridge +'+(B+1)]].forEach(([k,label])=>{
+        const btn=el('button','chip'+(state.chainKind===k?' on':''),label);
+        btn.onclick=()=>{ state.chainKind=k; render(); };
+        chainRow.appendChild(btn);
+      });
+      chainRow.appendChild(el('span',null,'chain: <b class="a">'+chain.map(n=>toB(n,B)).join(' → ')+'</b>'));
+    }
+
+    grid.style.gridTemplateColumns='auto repeat('+B+',1fr)';
+    grid.innerHTML='';
+    grid.appendChild(el('div'));
+    for(let u=0;u<B;u++) grid.appendChild(el('div','hdr',DIG[u]));
+    for(let t=1;t<=B-1;t++){
+      grid.appendChild(el('div','hdr',DIG[t]+'_'));
+      for(let u=0;u<B;u++){
+        const n=t*B+u, a=an(n,B);
+        const c=el('div','cell'+(n===state.sel?' sel':''), toB(n,B));
+        c.setAttribute('role','button'); c.setAttribute('tabindex','0');
+        c.setAttribute('aria-label','number '+toB(n,B)+' base '+B);
+        if(state.mode==='sums'){ c.style.background=sumColor(a.sum,B); c.style.color='#10241A'; c.style.borderColor='transparent'; }
+        else if(state.mode==='diffs'){ c.style.background=diffColor(a.diff,B); c.style.color='#10241A'; c.style.borderColor='transparent'; }
+        else if(state.mode==='chain'){
+          if(chain.includes(n)){
+            const isStart=(n===cs);
+            c.style.background=isStart?COLOR.amber:'rgba(255,177,61,.35)';
+            c.style.color=isStart?'#1E1503':COLOR.chalk; c.style.borderColor=COLOR.amber;
+          }
+        } else {
+          const paint=(col,strong)=>{ c.style.background=strong?col+'CC':col+'33';
+            c.style.color=strong?'#10241A':col; c.style.borderColor=col; if(strong)c.style.fontWeight='600'; };
+          if(p13.core.includes(n))paint(COLOR.amber,true);
+          else if(p13.inv.includes(n))paint(COLOR.amber,false);
+          else if(p14.core.includes(n))paint(COLOR.green,true);
+          else if(p14.inv.includes(n))paint(COLOR.green,false);
+          else if(br.includes(n))paint(COLOR.blue,true);
+          if(B===10&&n===47)c.style.boxShadow='0 0 0 2px '+COLOR.pink;
+        }
+        const pick=()=>{ state.sel=n; render(); };
+        c.onclick=pick; c.onkeydown=e=>{ if(e.key==='Enter')pick(); };
+        grid.appendChild(c);
+      }
+    }
+
+    if(state.mode==='patterns'||state.mode==='reborn'){
+      const s13=p13.core.length?an(p13.core[0],B).sum:'—';
+      const s14=p14.core.length?an(p14.core[0],B).sum:'—';
+      legend.innerHTML='<span><span class="a">■</span> pattern of '+(B+3)+' (sum '+s13+')</span>'+
+        '<span><span class="g">■</span> pattern of '+(B+4)+' (sum '+s14+')</span>'+
+        '<span><span class="b">■</span> bridge (difference 5)</span>'+
+        '<span>pale = inverses beyond the palindrome</span>'+
+        (B===10?'<span><span class="p">◯</span> 47 — the border between the patterns</span>':'');
+      legend.style.display='flex';
+    } else legend.style.display='none';
+
+    const s=an(state.sel,B);
+    detail.innerHTML='<span class="big">'+toB(state.sel,B)+'</span> '+
+      '<span style="color:var(--muted);font-size:13px">(base '+B+' · '+state.sel+' in decimal)</span><br>'+
+      'digit sum <b>'+s.sum+'</b> <span style="color:var(--muted)">· frozen under +'+(B-1)+'</span> &nbsp;·&nbsp; '+
+      'digit difference <b>'+s.diff+'</b> <span style="color:var(--muted)">· frozen under +'+(B+1)+'</span><br>'+
+      'reversal <b>'+toB(s.rev,B)+'</b> <span style="color:var(--muted)">· differs by '+Math.abs(state.sel-s.rev)+
+      ' = '+(B-1)+' × '+Math.abs(s.t-s.u)+'</span> &nbsp;·&nbsp; '+
+      'mod '+(B-1)+': <b>'+(state.sel%(B-1))+'</b> · mod '+(B+1)+': <b>'+(state.sel%(B+1))+'</b>';
+
+    if(readout){
+      const fmt=arr=>arr.map(n=>toB(n,B)).join(' → ');
+      readout.innerHTML='<b class="a">Pattern of '+(B+3)+':</b> '+(p13.core.length?fmt(p13.core):'—')+
+        (p13.inv.length?' <span style="color:var(--muted)">· inverses '+fmt(p13.inv)+'</span>':'')+'<br>'+
+        '<b class="g">Pattern of '+(B+4)+':</b> '+(p14.core.length?fmt(p14.core):'—')+
+        (p14.inv.length?' <span style="color:var(--muted)">· inverses '+fmt(p14.inv)+'</span>':'')+'<br>'+
+        '<b class="b">Bridge (difference 5):</b> '+fmt(br)+
+        ' <span style="color:var(--muted)">— threading between the even-sum ladders it can never touch.</span>';
+    }
+  }
+  render();
+}
+
+makeExplorer('w1',{ defaultMode:'patterns' });
+makeExplorer('w2',{ defaultMode:'reborn', bases:[6,8,9,10,11,12,16] });
+})();
+</script>
+</body>
+</html>
